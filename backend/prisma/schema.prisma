@@ -1,0 +1,35 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ShortUrl {
+  id                Int                 @default(autoincrement()) @id
+  originalUrl       String
+  shortUrl          String              @unique
+  alias             String              @db.VarChar(20) @unique
+  clickCount        Int?                @default(0)
+  expiredAt         DateTime
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  shortUrlAnalytics ShortUrlAnalytic[]
+}
+
+model ShortUrlAnalytic {
+  id          Int        @default(autoincrement()) @id
+  ipAddress   String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  shortUrl    ShortUrl   @relation(fields: [shortUrlId], references: [id])
+  shortUrlId  Int
+}
