@@ -7,6 +7,10 @@ import { PrismaService } from '@/services/prisma.service';
 export class ShortUrlRepository {
   constructor(private prismaService: PrismaService) {}
 
+  async findAllShortUrls(): Promise<ShortUrl[]> {
+    return this.prismaService.shortUrl.findMany();
+  }
+
   async findOriginalUrlAndUpdateClickCount(
     shortUrl: UniqueShortUrl,
   ): Promise<string> {
@@ -50,7 +54,7 @@ export class ShortUrlRepository {
   deleteShortUrl(shortUrl: UniqueShortUrl): Promise<ShortUrl> {
     return this.prismaService.shortUrl.delete({
       where: {
-        shortUrl,
+        alias: shortUrl,
       } as Prisma.ShortUrlWhereUniqueInput,
     });
   }

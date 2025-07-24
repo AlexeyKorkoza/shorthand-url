@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { nanoid } from 'nanoid';
 import { Prisma, ShortUrl } from '@prisma/client';
 
 import { ShortUrlRepository } from '@/modules/short-url/repositories/short-url.repository';
 import {
-  CreateShortUrlDto,
+  type CreateShortUrlDto,
   type GetShortUrlInfoDto,
 } from '@/modules/short-url/dtos';
 
@@ -22,6 +22,10 @@ export class ShortUrlService {
     return `${baseUrl}/${alias}`;
   }
 
+  async getAllShortUrls(): Promise<ShortUrl[]> {
+    return this.shortUrlRepository.findAllShortUrls();
+  }
+
   async findOriginalUrlAndUpdateClickCount(
     shortUrl: UniqueShortUrl,
   ): Promise<string> {
@@ -32,11 +36,11 @@ export class ShortUrlService {
     shortUrl: UniqueShortUrl,
   ): Promise<GetShortUrlInfoDto> {
     const where = {
-      shortUrl,
+      alias: shortUrl,
     };
     const result = await this.shortUrlRepository.findShortUrl(where);
     if (!result) {
-      throw new Error('Short URL not found');
+      throw new HttpException('Short URL not found', HttpStatus.BAD_REQUEST);
     }
 
     return {
@@ -47,7 +51,7 @@ export class ShortUrlService {
   }
 
   async createShortUrl(body: CreateShortUrlDto): Promise<string> {
-    const { originalUrl, alias, expiredAt = '' } = body;
+    const { originalUrl, alias, expiredAt } = body;
 
     const finalAlias = alias ?? this.generateShortId();
     const where = {
@@ -55,14 +59,17 @@ export class ShortUrlService {
     };
 
     const result = await this.shortUrlRepository.findShortUrl(where);
-    if (!result) {
-      throw new Error('Short URL already exists');
+    if (result) {
+      throw new HttpException(
+        'Short URL already exists',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const shortUrl = this.buildShortUrl(finalAlias);
     const createShortUrlBody: Prisma.ShortUrlCreateInput = {
       alias: finalAlias,
-      expiredAt,
+      expiredAt: expiredAt ? new Date(expiredAt) : null,
       originalUrl,
       shortUrl,
     };
