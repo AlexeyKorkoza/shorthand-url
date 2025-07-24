@@ -5,13 +5,11 @@ import { PrismaService } from '@/services/prisma.service';
 
 @Injectable()
 export class AnalyticsRepository {
-  private readonly IP_ADDRESSES_COUNT = 5;
-
   constructor(private prismaService: PrismaService) {}
 
   findLastIpAddressesByCount(
     shortUrlId: number,
-    count = this.IP_ADDRESSES_COUNT,
+    count: number,
   ): Promise<ShortUrlAnalytic[]> {
     return this.prismaService.shortUrlAnalytic.findMany({
       take: count,

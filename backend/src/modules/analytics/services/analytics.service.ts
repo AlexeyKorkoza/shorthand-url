@@ -6,6 +6,8 @@ import { type GetAnalyticsDto } from '@/modules/analytics/dtos';
 
 @Injectable()
 export class AnalyticsService {
+  private readonly IP_ADDRESSES_COUNT = 5;
+
   constructor(
     private analyticsRepository: AnalyticsRepository,
     private shortUrlRepository: ShortUrlRepository,
@@ -24,7 +26,10 @@ export class AnalyticsService {
 
     const { id } = shortUrlResult;
     const lastIpAddressesResult =
-      await this.analyticsRepository.findLastIpAddressesByCount(id);
+      await this.analyticsRepository.findLastIpAddressesByCount(
+        id,
+        this.IP_ADDRESSES_COUNT,
+      );
 
     if (!lastIpAddressesResult) {
       throw new Error('Could not find last addresses');
