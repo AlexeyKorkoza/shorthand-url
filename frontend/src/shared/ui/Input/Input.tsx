@@ -5,7 +5,7 @@ import styles from "./Input.module.css";
 
 type Props = React.ComponentProps<"input">;
 
-export const Input = ({ className, type, ...props }: Props) => {
+export const Input = ({ className, type = "text", ...props }: Props) => {
 	return (
 		<input
 			type={type}
