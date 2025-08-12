@@ -1,4 +1,5 @@
 import tailwindcss from "@tailwindcss/vite";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig, loadEnv, type UserConfig } from "vite";
@@ -8,7 +9,16 @@ export default defineConfig(({ mode }): UserConfig => {
 	const port = +env.VITE_PORT || 5173;
 
 	return {
-		plugins: [react(), tailwindcss()],
+		plugins: [
+			tanstackRouter({
+				target: "react",
+				autoCodeSplitting: true,
+				routesDirectory: "./src/app/router",
+				generatedRouteTree: "./src/app/router/routeTree.gen.ts",
+			}),
+			react(),
+			tailwindcss(),
+		],
 		resolve: {
 			alias: {
 				"@": path.resolve(__dirname, "./src"),

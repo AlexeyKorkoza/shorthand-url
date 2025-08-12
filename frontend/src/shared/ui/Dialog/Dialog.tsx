@@ -3,7 +3,7 @@ import { XIcon } from "lucide-react";
 import type * as React from "react";
 
 import { cn } from "@/shared/lib/classname";
-import styles from "./Dialog.module.css";
+import styles from "./Dialog.module.scss";
 
 function Dialog({
 	...props

@@ -1,7 +1,7 @@
 import type * as React from "react";
 
 import { cn } from "@/shared/lib/classname";
-import styles from "./Input.module.css";
+import styles from "./Input.module.scss";
 
 type Props = React.ComponentProps<"input">;
 
