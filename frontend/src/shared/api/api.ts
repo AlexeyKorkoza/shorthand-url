@@ -16,7 +16,6 @@ class HttpClient {
 
 		this.client = ky.create({
 			prefixUrl: baseUrl,
-			credentials: "include",
 			hooks: {
 				beforeRequest: [
 					(request) => {
@@ -38,6 +37,7 @@ class HttpClient {
 		const urlWithParams = params
 			? `${url}?${new URLSearchParams(params).toString()}`
 			: url;
+		console.log("urlWithParams", urlWithParams);
 
 		try {
 			return await this.client(urlWithParams, {
@@ -83,6 +83,7 @@ class HttpClient {
 const createHttpClient = () => {
 	const baseUrl = import.meta.env.VITE_API_URL;
 
+	console.log("baseUrl", baseUrl);
 	return new HttpClient({
 		baseUrl,
 	});

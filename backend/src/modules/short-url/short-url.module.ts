@@ -1,3 +1,4 @@
+import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 
 import { ShortUrlController } from '@/modules/short-url/controllers/short-url.controller';
@@ -6,6 +7,7 @@ import { ShortUrlRepository } from '@/modules/short-url/repositories/short-url.r
 import { PrismaService } from '@/services/prisma.service';
 
 @Module({
+  imports: [ConfigModule],
   controllers: [ShortUrlController],
   providers: [ShortUrlService, ShortUrlRepository, PrismaService],
 })

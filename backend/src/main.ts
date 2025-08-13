@@ -8,12 +8,12 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   const port = configService.get('port') as string;
-  await app.listen(port);
-
   const globalPrefix = configService.get('apiPrefix') as string;
   app.setGlobalPrefix(globalPrefix);
   app.enableCors({
     origin: ['http://localhost:5173'],
   });
+
+  await app.listen(port);
 }
 bootstrap();

@@ -1,4 +1,5 @@
 export const ROUTE_PATHS = {
-	main: "/",
-	new: "/new",
+	main: "/urls",
+	createUrl: "/urls/new",
+	viewUrl: "/urls/$urlId",
 };

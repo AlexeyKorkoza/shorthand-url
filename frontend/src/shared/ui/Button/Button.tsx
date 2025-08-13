@@ -46,7 +46,7 @@ const Button = ({
 	return (
 		<Component
 			data-slot="button"
-			className={cn(buttonVariants({ variant, size, className }))}
+			className={cn(buttonVariants({ variant, size }), className)}
 			type={type}
 			{...props}
 		/>

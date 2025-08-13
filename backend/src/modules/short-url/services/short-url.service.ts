@@ -1,4 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { nanoid } from 'nanoid';
 import { Prisma, ShortUrl } from '@prisma/client';
 
@@ -10,14 +11,17 @@ import {
 
 @Injectable()
 export class ShortUrlService {
-  constructor(private shortUrlRepository: ShortUrlRepository) {}
+  constructor(
+    private shortUrlRepository: ShortUrlRepository,
+    private configService: ConfigService,
+  ) {}
 
   private generateShortId(): string {
     return nanoid(7);
   }
 
   private buildShortUrl(alias: string): string {
-    const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+    const baseUrl = this.configService.get('baseUrl') as string;
 
     return `${baseUrl}/${alias}`;
   }

@@ -8,5 +8,7 @@ export const useGetShortUrlList = (): UseQueryResult<GetShortUrlDto[]> => {
 	return useQuery({
 		queryKey: urlKeys.list,
 		queryFn: () => getShortUrlList(),
+		refetchOnReconnect: false,
+		refetchOnWindowFocus: false,
 	});
 };

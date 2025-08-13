@@ -1,3 +1,4 @@
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
 	createRootRoute,
 	createRoute,
@@ -14,7 +15,8 @@ const rootRoute = createRootRoute({
 	component: () => (
 		<>
 			<Outlet />
-			<TanStackRouterDevtools initialIsOpen={false} />
+			<TanStackRouterDevtools position="bottom-right" initialIsOpen={false} />
+			<ReactQueryDevtools buttonPosition="top-right" />
 		</>
 	),
 });
@@ -27,11 +29,21 @@ const indexRoute = createRoute({
 
 const createUrlRoute = createRoute({
 	getParentRoute: () => rootRoute,
-	path: ROUTE_PATHS.new,
+	path: ROUTE_PATHS.createUrl,
 	component: CreateShortUrlForm,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, createUrlRoute]);
+const viewUrlRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: ROUTE_PATHS.viewUrl,
+	component: () => <div>View Url</div>,
+});
+
+const routeTree = rootRoute.addChildren([
+	indexRoute,
+	createUrlRoute,
+	viewUrlRoute,
+]);
 
 const router = createRouter({ routeTree });
 
