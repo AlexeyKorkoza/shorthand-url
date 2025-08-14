@@ -3,6 +3,7 @@ import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 
 import {
   type CreateShortUrlDto,
+  type CreateShortUrlResponseDto,
   type GetShortUrlInfoDto,
 } from '@/modules/short-url/dtos';
 import { ShortUrlService } from '@/modules/short-url/services/short-url.service';
@@ -17,7 +18,9 @@ export class ShortUrlController {
   }
 
   @Post('/shorten')
-  createShortUrl(@Body() body: CreateShortUrlDto): Promise<string> {
+  createShortUrl(
+    @Body() body: CreateShortUrlDto,
+  ): Promise<CreateShortUrlResponseDto> {
     return this.shortUrlService.createShortUrl(body);
   }
 

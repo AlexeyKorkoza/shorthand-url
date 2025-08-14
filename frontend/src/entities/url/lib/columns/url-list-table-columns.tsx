@@ -17,14 +17,13 @@ export const urlListTableColumns = () => [
 	}),
 	columnHelper.display({
 		id: "View",
-		header: () => "Age",
 		cell: (info) => {
 			const { row } = info;
 			const { id } = row.original;
 
 			return (
 				<div>
-					<Button>
+					<Button asChild>
 						<Link to={ROUTE_PATHS.viewUrl} params={{ urlId: id }}>
 							View
 						</Link>

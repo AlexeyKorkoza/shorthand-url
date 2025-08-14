@@ -6,6 +6,7 @@ import { Prisma, ShortUrl } from '@prisma/client';
 import { ShortUrlRepository } from '@/modules/short-url/repositories/short-url.repository';
 import {
   type CreateShortUrlDto,
+  type CreateShortUrlResponseDto,
   type GetShortUrlInfoDto,
 } from '@/modules/short-url/dtos';
 
@@ -54,10 +55,12 @@ export class ShortUrlService {
     };
   }
 
-  async createShortUrl(body: CreateShortUrlDto): Promise<string> {
+  async createShortUrl(
+    body: CreateShortUrlDto,
+  ): Promise<CreateShortUrlResponseDto> {
     const { originalUrl, alias, expiredAt } = body;
 
-    const finalAlias = alias ?? this.generateShortId();
+    const finalAlias = alias || this.generateShortId();
     const where = {
       alias: finalAlias,
     };
@@ -80,7 +83,9 @@ export class ShortUrlService {
 
     await this.shortUrlRepository.createShortUrl(createShortUrlBody);
 
-    return shortUrl;
+    return {
+      shortUrl,
+    };
   }
 
   async deleteShortUrl(shortUrl: UniqueShortUrl): Promise<ShortUrl> {
