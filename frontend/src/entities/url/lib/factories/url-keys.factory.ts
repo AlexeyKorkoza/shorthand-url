@@ -1,3 +1,3 @@
 export const urlKeys = {
-	list: ["url", "list"],
+	list: ["urls", "list"],
 };

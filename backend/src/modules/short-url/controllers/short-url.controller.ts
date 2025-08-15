@@ -1,5 +1,14 @@
 import { ShortUrl } from '@prisma/client';
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 
 import {
   type CreateShortUrlDto,
@@ -38,10 +47,9 @@ export class ShortUrlController {
     return this.shortUrlService.getShortUrlInformation(shortUrl);
   }
 
-  @Delete('/delete/:shortUrl')
-  deleteShortUrl(
-    @Param('shortUrl') shortUrl: UniqueShortUrl,
-  ): Promise<ShortUrl> {
-    return this.shortUrlService.deleteShortUrl(shortUrl);
+  @Delete('/delete/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteShortUrl(@Param('id') id: string): Promise<void> {
+    return this.shortUrlService.deleteShortUrl(id);
   }
 }

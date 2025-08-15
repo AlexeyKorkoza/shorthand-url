@@ -51,10 +51,10 @@ export class ShortUrlRepository {
     });
   }
 
-  deleteShortUrl(shortUrl: UniqueShortUrl): Promise<ShortUrl> {
+  deleteShortUrl(id: number): Promise<ShortUrl> {
     return this.prismaService.shortUrl.delete({
       where: {
-        alias: shortUrl,
+        id,
       } as Prisma.ShortUrlWhereUniqueInput,
     });
   }

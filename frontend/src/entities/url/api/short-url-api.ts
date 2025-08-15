@@ -9,8 +9,8 @@ export const createShortUrl = (body: CreateShortUrlDto): Promise<string> => {
 	});
 };
 
-export const deleteShortUrl = (shortUrl: string): Promise<void> => {
-	return httpClient.delete(`${BASE_SHORT_API_URL}/delete/${shortUrl}`);
+export const deleteShortUrl = (id: number): Promise<void> => {
+	return httpClient.delete(`${BASE_SHORT_API_URL}/delete/${id}`);
 };
 
 export const getShortUrlList = (): Promise<GetShortUrlDto[]> => {

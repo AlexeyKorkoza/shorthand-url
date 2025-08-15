@@ -88,7 +88,16 @@ export class ShortUrlService {
     };
   }
 
-  async deleteShortUrl(shortUrl: UniqueShortUrl): Promise<ShortUrl> {
-    return this.shortUrlRepository.deleteShortUrl(shortUrl);
+  async deleteShortUrl(id: string): Promise<void> {
+    if (!id) {
+      throw new HttpException('ID is required', HttpStatus.BAD_REQUEST);
+    }
+
+    const result = await this.shortUrlRepository.deleteShortUrl(+id);
+    if (!result) {
+      throw new HttpException('Something bad happened', HttpStatus.BAD_REQUEST);
+    }
+
+    return;
   }
 }
