@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { AnalyticsRepository } from '@/modules/analytics/repositories/analytics.repository';
+import { AnalyticsRepository } from '@/modules/short-url/repositories/analytics.repository';
 import { ShortUrlRepository } from '@/modules/short-url/repositories/short-url.repository';
-import { type GetAnalyticsDto } from '@/modules/analytics/dtos';
+import { type GetAnalyticsDto } from '@/modules/short-url/dtos';
 
 @Injectable()
 export class AnalyticsService {

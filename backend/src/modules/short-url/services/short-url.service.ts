@@ -37,11 +37,9 @@ export class ShortUrlService {
     return this.shortUrlRepository.findOriginalUrlAndUpdateClickCount(shortUrl);
   }
 
-  async getShortUrlInformation(
-    shortUrl: UniqueShortUrl,
-  ): Promise<GetShortUrlInfoDto> {
+  async getShortUrlInformation(alias: Alias): Promise<GetShortUrlInfoDto> {
     const where = {
-      alias: shortUrl,
+      alias,
     };
     const result = await this.shortUrlRepository.findShortUrl(where);
     if (!result) {
@@ -49,6 +47,7 @@ export class ShortUrlService {
     }
 
     return {
+      alias,
       clickCount: result.clickCount ?? 0,
       createdAt: result.createdAt,
       originalUrl: result.originalUrl,

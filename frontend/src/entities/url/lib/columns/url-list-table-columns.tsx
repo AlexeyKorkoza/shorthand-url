@@ -26,13 +26,13 @@ export const urlListTableColumns = ({ deleteShortUrl, idToDelete }: Props) => [
 		id: "View",
 		cell: (info) => {
 			const { row } = info;
-			const { id } = row.original;
+			const { id, alias } = row.original;
 			const isLoading = id === idToDelete;
 
 			return (
 				<div className="flex gap-2 items-center">
 					<Button asChild>
-						<Link to={ROUTE_PATHS.viewUrl} params={{ urlId: id }}>
+						<Link to={ROUTE_PATHS.viewUrl} params={{ urlId: alias }}>
 							View
 						</Link>
 					</Button>

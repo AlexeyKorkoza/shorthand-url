@@ -61,7 +61,7 @@ export const CreateShortUrlForm = () => {
 
 			await createShortUrl(body);
 			await navigate({
-				to: ROUTE_PATHS.main,
+				to: ROUTE_PATHS.urls,
 			});
 		} catch (error) {
 			console.log("Error", error);
@@ -164,7 +164,7 @@ export const CreateShortUrlForm = () => {
 					/>
 					<div className="flex items-center justify-center gap-2 my-2">
 						<Button asChild variant="outline">
-							<Link to={ROUTE_PATHS.main}>Back</Link>
+							<Link to={ROUTE_PATHS.urls}>Back</Link>
 						</Button>
 						<Button type="submit">Create</Button>
 					</div>

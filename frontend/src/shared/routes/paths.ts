@@ -1,5 +1,6 @@
 export const ROUTE_PATHS = {
-	main: "/urls",
+	main: "",
+	urls: "/urls",
 	createUrl: "/urls/new",
 	viewUrl: "/urls/$urlId",
 };

@@ -14,12 +14,17 @@ import {
   type CreateShortUrlDto,
   type CreateShortUrlResponseDto,
   type GetShortUrlInfoDto,
+  type GetAnalyticsDto,
 } from '@/modules/short-url/dtos';
 import { ShortUrlService } from '@/modules/short-url/services/short-url.service';
+import { AnalyticsService } from '@/modules/short-url/services/analytics.service';
 
-@Controller('short-url')
+@Controller('')
 export class ShortUrlController {
-  constructor(private readonly shortUrlService: ShortUrlService) {}
+  constructor(
+    private readonly shortUrlService: ShortUrlService,
+    private readonly analyticsService: AnalyticsService,
+  ) {}
 
   @Get('/list')
   getAllShortUrls(): Promise<ShortUrl[]> {
@@ -51,5 +56,12 @@ export class ShortUrlController {
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteShortUrl(@Param('id') id: string): Promise<void> {
     return this.shortUrlService.deleteShortUrl(id);
+  }
+
+  @Get('/analytics/:shortUrl')
+  getShortUrlAnalytics(
+    @Param('shortUrl') shortUrl: UniqueShortUrl,
+  ): Promise<GetAnalyticsDto> {
+    return this.analyticsService.getShortUrlAnalytics(shortUrl);
   }
 }

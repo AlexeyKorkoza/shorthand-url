@@ -10,10 +10,18 @@ import { cn } from "@/shared/lib/classname";
 type Props<T> = {
 	columns: ColumnDef<T, any>[];
 	data: T[];
+	emptyMessage?: string;
 	tableClassName?: string;
 };
 
-const Table = <T,>({ tableClassName = "", columns, data }: Props<T>) => {
+const DEFAULT_EMPTY_MESSAGE = "No data";
+
+const Table = <T,>({
+	tableClassName = "",
+	emptyMessage = DEFAULT_EMPTY_MESSAGE,
+	columns,
+	data,
+}: Props<T>) => {
 	const table = useReactTable({
 		data,
 		columns,
@@ -61,27 +69,33 @@ const Table = <T,>({ tableClassName = "", columns, data }: Props<T>) => {
 					data-slot="table-body"
 					className={cn("[&_tr:last-child]:border-0")}
 				>
-					{table.getRowModel().rows.map((row) => (
-						<tr
-							data-slot="table-row"
-							className={cn(
-								"hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
-							)}
-							key={row.id}
-						>
-							{row.getVisibleCells().map((cell) => (
-								<td
-									data-slot="table-cell"
-									className={cn(
-										"p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-									)}
-									key={cell.id}
-								>
-									{flexRender(cell.column.columnDef.cell, cell.getContext())}
-								</td>
-							))}
+					{data && data?.length > 0 ? (
+						table.getRowModel().rows.map((row) => (
+							<tr
+								data-slot="table-row"
+								className={cn(
+									"hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
+								)}
+								key={row.id}
+							>
+								{row.getVisibleCells().map((cell) => (
+									<td
+										data-slot="table-cell"
+										className={cn(
+											"p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+										)}
+										key={cell.id}
+									>
+										{flexRender(cell.column.columnDef.cell, cell.getContext())}
+									</td>
+								))}
+							</tr>
+						))
+					) : (
+						<tr className="flex justify-center mt-2">
+							<td>{emptyMessage}</td>
 						</tr>
-					))}
+					)}
 				</tbody>
 			</table>
 		</div>
