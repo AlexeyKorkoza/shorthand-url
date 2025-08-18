@@ -1,11 +1,13 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+
 import { urlListTableColumns } from "@/entities/url/lib/columns/url-list-table-columns.tsx";
 import { useDeleteShortUrl } from "@/entities/url/lib/hooks/useDeleteShortUrl.ts";
 import { useGetShortUrlList } from "@/entities/url/lib/hooks/useGetShortUrlList.ts";
 import type { GetShortUrlDto } from "@/entities/url/model";
 import { ROUTE_PATHS } from "@/shared/routes";
 import { Button } from "@/shared/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/Card";
 import { Icons } from "@/shared/ui/Icons";
 import { Table } from "@/shared/ui/Table";
 
@@ -44,9 +46,18 @@ export const UrlList = () => {
 	}
 
 	return (
-		<div>
-			<Button onClick={() => goToCreateUrlForm()}>Create</Button>
-			{data && <Table<GetShortUrlDto> columns={columns} data={data} />}
+		<div className="flex flex-col gap-4 p-4">
+			<Button className="w-fit" onClick={() => goToCreateUrlForm()}>
+				Create
+			</Button>
+			<Card>
+				<CardHeader>
+					<CardTitle></CardTitle>
+				</CardHeader>
+				<CardContent>
+					<Table<GetShortUrlDto> columns={columns} data={data ?? []} />
+				</CardContent>
+			</Card>
 		</div>
 	);
 };
