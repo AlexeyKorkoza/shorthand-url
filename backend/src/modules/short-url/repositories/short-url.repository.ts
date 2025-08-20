@@ -11,13 +11,11 @@ export class ShortUrlRepository {
     return this.prismaService.shortUrl.findMany();
   }
 
-  async findOriginalUrlAndUpdateClickCount(
-    shortUrl: UniqueShortUrl,
-  ): Promise<string> {
-    return await this.prismaService.$transaction(async (tx) => {
+  async findOriginalUrlAndUpdateClickCount(alias: Alias): Promise<ShortUrl> {
+    return this.prismaService.$transaction(async (tx) => {
       const result = await tx.shortUrl.findUnique({
         where: {
-          shortUrl,
+          alias,
         } as Prisma.ShortUrlWhereUniqueInput,
       });
       if (!result) {
@@ -30,10 +28,10 @@ export class ShortUrlRepository {
             increment: 1,
           },
         },
-        where: { shortUrl } as Prisma.ShortUrlWhereUniqueInput,
+        where: { alias } as Prisma.ShortUrlWhereUniqueInput,
       });
 
-      return result.originalUrl;
+      return result;
     });
   }
 

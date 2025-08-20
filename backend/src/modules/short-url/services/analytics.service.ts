@@ -13,11 +13,9 @@ export class AnalyticsService {
     private shortUrlRepository: ShortUrlRepository,
   ) {}
 
-  async getShortUrlAnalytics(
-    shortUrl: UniqueShortUrl,
-  ): Promise<GetAnalyticsDto> {
+  async getShortUrlAnalytics(alias: Alias): Promise<GetAnalyticsDto> {
     const where = {
-      alias: shortUrl,
+      alias,
     };
     const shortUrlResult = await this.shortUrlRepository.findShortUrl(where);
     if (!shortUrlResult) {
@@ -42,8 +40,20 @@ export class AnalyticsService {
     }));
 
     return {
-      clickCount: shortUrlResult?.clickCount ?? 0,
       ipAddresses,
     };
+  }
+
+  saveIpAddress({
+    shortUrlId,
+    ipAddress,
+  }: {
+    shortUrlId: number;
+    ipAddress: string;
+  }) {
+    return this.analyticsRepository.saveIpAddress({
+      shortUrlId,
+      ipAddress,
+    });
   }
 }

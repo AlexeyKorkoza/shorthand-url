@@ -63,10 +63,10 @@ export const ViewUrl = () => {
 								<span>Alias:</span>
 								<span>{shortUrlData?.alias ?? DEFAULT_VALUE}</span>
 							</div>
-						</div>
-						<div className="flex gap-2 items-center">
-							<span>Click count:</span>
-							<span>{shortUrlAnalyticsData?.clickCount ?? 0}</span>
+							<div className="flex gap-2">
+								<span>Click count:</span>
+								<span>{shortUrlData?.clickCount ?? 0}</span>
+							</div>
 						</div>
 					</CardContent>
 				</Card>

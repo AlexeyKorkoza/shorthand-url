@@ -18,4 +18,23 @@ export class AnalyticsRepository {
       } as Prisma.ShortUrlAnalyticWhereUniqueInput,
     });
   }
+
+  saveIpAddress({
+    shortUrlId,
+    ipAddress,
+  }: {
+    shortUrlId: number;
+    ipAddress: string;
+  }): Promise<ShortUrlAnalytic> {
+    return this.prismaService.shortUrlAnalytic.create({
+      data: {
+        ipAddress,
+        shortUrl: {
+          connect: {
+            id: shortUrlId,
+          },
+        },
+      },
+    });
+  }
 }

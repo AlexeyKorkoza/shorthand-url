@@ -19,7 +19,7 @@ import {
 import { ShortUrlService } from '@/modules/short-url/services/short-url.service';
 import { AnalyticsService } from '@/modules/short-url/services/analytics.service';
 
-@Controller('')
+@Controller('url')
 export class ShortUrlController {
   constructor(
     private readonly shortUrlService: ShortUrlService,
@@ -38,13 +38,6 @@ export class ShortUrlController {
     return this.shortUrlService.createShortUrl(body);
   }
 
-  @Get()
-  redirectToOriginalUrl(
-    @Param('shortUrl') shortUrl: UniqueShortUrl,
-  ): Promise<string> {
-    return this.shortUrlService.findOriginalUrlAndUpdateClickCount(shortUrl);
-  }
-
   @Get('/info/:shortUrl')
   getShortUrlInformation(
     @Param('shortUrl') shortUrl: UniqueShortUrl,
@@ -58,10 +51,8 @@ export class ShortUrlController {
     return this.shortUrlService.deleteShortUrl(id);
   }
 
-  @Get('/analytics/:shortUrl')
-  getShortUrlAnalytics(
-    @Param('shortUrl') shortUrl: UniqueShortUrl,
-  ): Promise<GetAnalyticsDto> {
-    return this.analyticsService.getShortUrlAnalytics(shortUrl);
+  @Get('/analytics/:alias')
+  getShortUrlAnalytics(@Param('alias') alias: Alias): Promise<GetAnalyticsDto> {
+    return this.analyticsService.getShortUrlAnalytics(alias);
   }
 }

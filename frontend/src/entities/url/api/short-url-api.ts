@@ -5,30 +5,30 @@ import type {
 } from "@/entities/url/model";
 import { httpClient } from "@/shared/api";
 
-const BASE_SHORT_API_URL = "";
+const BASE_SHORT_API_URL = "url";
 
 export const createShortUrl = (body: CreateShortUrlDto): Promise<string> => {
-	return httpClient.post(`${BASE_SHORT_API_URL}shorten`, {
+	return httpClient.post(`${BASE_SHORT_API_URL}/shorten`, {
 		body: JSON.stringify(body),
 	});
 };
 
 export const deleteShortUrl = (id: number): Promise<void> => {
-	return httpClient.delete(`${BASE_SHORT_API_URL}delete/${id}`);
+	return httpClient.delete(`${BASE_SHORT_API_URL}/delete/${id}`);
 };
 
 export const getShortUrlList = (): Promise<GetShortUrlDto[]> => {
-	return httpClient.get(`${BASE_SHORT_API_URL}list`);
+	return httpClient.get(`${BASE_SHORT_API_URL}/list`);
 };
 
 export const getShortUrlAnalytics = (
 	shortUrl: UniqueShortUrl,
 ): Promise<GetAnalyticsDto> => {
-	return httpClient.get(`${BASE_SHORT_API_URL}analytics/${shortUrl}`);
+	return httpClient.get(`${BASE_SHORT_API_URL}/analytics/${shortUrl}`);
 };
 
 export const getShortUrlInfo = (
 	shortUrl: UniqueShortUrl,
 ): Promise<GetShortUrlDto> => {
-	return httpClient.get(`${BASE_SHORT_API_URL}info/${shortUrl}`);
+	return httpClient.get(`${BASE_SHORT_API_URL}/info/${shortUrl}`);
 };

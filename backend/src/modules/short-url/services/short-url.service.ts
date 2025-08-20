@@ -31,10 +31,14 @@ export class ShortUrlService {
     return this.shortUrlRepository.findAllShortUrls();
   }
 
-  async findOriginalUrlAndUpdateClickCount(
-    shortUrl: UniqueShortUrl,
-  ): Promise<string> {
-    return this.shortUrlRepository.findOriginalUrlAndUpdateClickCount(shortUrl);
+  async findOriginalUrlAndUpdateClickCount(alias: Alias): Promise<ShortUrl> {
+    const result =
+      await this.shortUrlRepository.findOriginalUrlAndUpdateClickCount(alias);
+    if (!result) {
+      throw new HttpException('Short URL not found', HttpStatus.NOT_FOUND);
+    }
+
+    return result;
   }
 
   async getShortUrlInformation(alias: Alias): Promise<GetShortUrlInfoDto> {
