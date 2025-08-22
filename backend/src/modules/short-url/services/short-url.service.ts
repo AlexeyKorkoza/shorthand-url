@@ -5,9 +5,10 @@ import { Prisma, ShortUrl } from '@prisma/client';
 
 import { ShortUrlRepository } from '@/modules/short-url/repositories/short-url.repository';
 import {
-  type CreateShortUrlDto,
-  type CreateShortUrlResponseDto,
+  CreateShortUrlDto,
+  CreateShortUrlResponseDto,
   type GetShortUrlInfoDto,
+  GetShortUrlDto,
 } from '@/modules/short-url/dtos';
 
 @Injectable()
@@ -27,7 +28,7 @@ export class ShortUrlService {
     return `${baseUrl}/${alias}`;
   }
 
-  async getAllShortUrls(): Promise<ShortUrl[]> {
+  async getAllShortUrls(): Promise<GetShortUrlDto[]> {
     return this.shortUrlRepository.findAllShortUrls();
   }
 

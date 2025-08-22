@@ -1,4 +1,3 @@
-import { ShortUrl } from '@prisma/client';
 import {
   Body,
   Controller,
@@ -9,16 +8,24 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
+import {
+  ApiOkResponse,
+  ApiNoContentResponse,
+  ApiTags,
+  ApiBody,
+} from '@nestjs/swagger';
 
 import {
-  type CreateShortUrlDto,
-  type CreateShortUrlResponseDto,
-  type GetShortUrlInfoDto,
-  type GetAnalyticsDto,
+  CreateShortUrlDto,
+  CreateShortUrlResponseDto,
+  GetShortUrlInfoDto,
+  GetAnalyticsDto,
+  GetShortUrlDto,
 } from '@/modules/short-url/dtos';
 import { ShortUrlService } from '@/modules/short-url/services/short-url.service';
 import { AnalyticsService } from '@/modules/short-url/services/analytics.service';
 
+@ApiTags('Url')
 @Controller('url')
 export class ShortUrlController {
   constructor(
@@ -27,11 +34,14 @@ export class ShortUrlController {
   ) {}
 
   @Get('/list')
-  getAllShortUrls(): Promise<ShortUrl[]> {
+  @ApiOkResponse({ type: [GetShortUrlDto] })
+  getAllShortUrls(): Promise<GetShortUrlDto[]> {
     return this.shortUrlService.getAllShortUrls();
   }
 
   @Post('/shorten')
+  @ApiBody({ type: CreateShortUrlDto })
+  @ApiOkResponse({ type: CreateShortUrlResponseDto })
   createShortUrl(
     @Body() body: CreateShortUrlDto,
   ): Promise<CreateShortUrlResponseDto> {
@@ -39,6 +49,7 @@ export class ShortUrlController {
   }
 
   @Get('/info/:shortUrl')
+  @ApiOkResponse({ type: GetShortUrlInfoDto })
   getShortUrlInformation(
     @Param('shortUrl') shortUrl: UniqueShortUrl,
   ): Promise<GetShortUrlInfoDto> {
@@ -47,11 +58,13 @@ export class ShortUrlController {
 
   @Delete('/delete/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse()
   deleteShortUrl(@Param('id') id: string): Promise<void> {
     return this.shortUrlService.deleteShortUrl(id);
   }
 
   @Get('/analytics/:alias')
+  @ApiOkResponse({ type: GetAnalyticsDto })
   getShortUrlAnalytics(@Param('alias') alias: Alias): Promise<GetAnalyticsDto> {
     return this.analyticsService.getShortUrlAnalytics(alias);
   }

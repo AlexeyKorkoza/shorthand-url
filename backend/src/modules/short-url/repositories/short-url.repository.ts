@@ -2,13 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { Prisma, ShortUrl } from '@prisma/client';
 
 import { PrismaService } from '@/services/prisma.service';
+import { GetShortUrlDto } from '@/modules/short-url/dtos';
 
 @Injectable()
 export class ShortUrlRepository {
   constructor(private prismaService: PrismaService) {}
 
-  async findAllShortUrls(): Promise<ShortUrl[]> {
-    return this.prismaService.shortUrl.findMany();
+  async findAllShortUrls(): Promise<GetShortUrlDto[]> {
+    return this.prismaService.shortUrl.findMany({
+      omit: {
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   }
 
   async findOriginalUrlAndUpdateClickCount(alias: Alias): Promise<ShortUrl> {

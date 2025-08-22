@@ -1,8 +1,10 @@
 import { Controller, Get, Ip, Param, Redirect } from '@nestjs/common';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { ShortUrlService } from '@/modules/short-url/services/short-url.service';
 import { AnalyticsService } from '@/modules/short-url/services/analytics.service';
 
+@ApiTags('Redirect')
 @Controller()
 export class ShortUrlRedirectController {
   constructor(
@@ -12,6 +14,7 @@ export class ShortUrlRedirectController {
 
   @Get(':alias')
   @Redirect()
+  @ApiOkResponse({ description: 'Redirects to the original URL' })
   async redirectToOriginalUrl(
     @Param('alias') alias: Alias,
     @Ip() ipAddress: string,
