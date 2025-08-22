@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 import { AppModule } from '@/modules/app/app.module';
@@ -16,6 +17,7 @@ async function bootstrap() {
   app.enableCors({
     origin: ['http://localhost:5173'],
   });
+  app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
     .setTitle('Short URL API')
