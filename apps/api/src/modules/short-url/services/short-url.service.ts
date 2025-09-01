@@ -1,8 +1,8 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { nanoid } from 'nanoid';
-import * as PrismaPkg from '@prisma/client';
 
+import { Prisma, type ShortUrl } from '@db/prisma-client';
 import { ShortUrlRepository } from '@/modules/short-url/repositories/short-url.repository';
 import {
   CreateShortUrlDto,
@@ -32,7 +32,7 @@ export class ShortUrlService {
     return this.shortUrlRepository.findAllShortUrls();
   }
 
-  async findOriginalUrlAndUpdateClickCount(alias: Alias): Promise<PrismaPkg.Prisma.ShortUrl> {
+  async findOriginalUrlAndUpdateClickCount(alias: Alias): Promise<ShortUrl> {
     const result =
       await this.shortUrlRepository.findOriginalUrlAndUpdateClickCount(alias);
     if (!result) {
@@ -45,7 +45,7 @@ export class ShortUrlService {
   async getShortUrlInformation(alias: Alias): Promise<GetShortUrlInfoDto> {
     const where = {
       alias,
-    } as PrismaPkg.Prisma.ShortUrlWhereUniqueInput;
+    } as Prisma.ShortUrlWhereUniqueInput;
     const result = await this.shortUrlRepository.findShortUrl(where);
     if (!result) {
       throw new HttpException('Short URL not found', HttpStatus.BAD_REQUEST);
@@ -67,7 +67,7 @@ export class ShortUrlService {
     const finalAlias = alias || this.generateShortId();
     const where = {
       alias: finalAlias,
-    } as PrismaPkg.Prisma.ShortUrlWhereUniqueInput;
+    } as Prisma.ShortUrlWhereUniqueInput;
 
     const result = await this.shortUrlRepository.findShortUrl(where);
     if (result) {
@@ -78,7 +78,7 @@ export class ShortUrlService {
     }
 
     const shortUrl = this.buildShortUrl(finalAlias);
-    const createShortUrlBody: PrismaPkg.Prisma.ShortUrlCreateInput = {
+    const createShortUrlBody: Prisma.ShortUrlCreateInput = {
       alias: finalAlias,
       expiredAt: expiredAt ? new Date(expiredAt) : null,
       originalUrl,

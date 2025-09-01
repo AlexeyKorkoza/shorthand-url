@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 
+import { type ShortUrlAnalytic } from '@db/prisma-client';
 import { PrismaService } from '@/services/prisma.service';
 
 @Injectable()
@@ -10,12 +10,12 @@ export class AnalyticsRepository {
   findLastIpAddressesByCount(
     shortUrlId: number,
     count: number,
-  ): Promise<Prisma.ShortUrlAnalytic[]> {
-    return this.prismaService.client.shortUrlAnalytic.findMany({
+  ): Promise<ShortUrlAnalytic[]> {
+    return this.prismaService.shortUrlAnalytic.findMany({
       take: count,
       where: {
         shortUrlId,
-      } as Prisma.ShortUrlAnalyticWhereInput,
+      },
     });
   }
 
@@ -25,8 +25,8 @@ export class AnalyticsRepository {
   }: {
     shortUrlId: number;
     ipAddress: string;
-  }): Promise<Prisma.ShortUrlAnalytic> {
-    return this.prismaService.client.shortUrlAnalytic.create({
+  }): Promise<ShortUrlAnalytic> {
+    return this.prismaService.shortUrlAnalytic.create({
       data: {
         ipAddress,
         shortUrl: {

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import * as PrismaPkg from '@prisma/client';
 
+import { Prisma, type ShortUrl } from '@db/prisma-client';
 import { PrismaService } from '@/services/prisma.service';
 import { GetShortUrlDto } from '@/modules/short-url/dtos';
 
@@ -9,7 +9,7 @@ export class ShortUrlRepository {
   constructor(private prismaService: PrismaService) {}
 
   async findAllShortUrls(): Promise<GetShortUrlDto[]> {
-    return this.prismaService.client.shortUrl.findMany({
+    return this.prismaService.shortUrl.findMany({
       omit: {
         createdAt: true,
         updatedAt: true,
@@ -17,12 +17,12 @@ export class ShortUrlRepository {
     });
   }
 
-  async findOriginalUrlAndUpdateClickCount(alias: Alias): Promise<PrismaPkg.Prisma.ShortUrl> {
-    return this.prismaService.client.$transaction(async (tx) => {
+  async findOriginalUrlAndUpdateClickCount(alias: Alias): Promise<ShortUrl> {
+    return this.prismaService.$transaction(async (tx) => {
       const result = await tx.shortUrl.findUnique({
         where: {
           alias,
-        } as PrismaPkg.Prisma.ShortUrlWhereUniqueInput,
+        } as Prisma.ShortUrlWhereUniqueInput,
       });
       if (!result) {
         throw new Error('Short URL not found');
@@ -34,7 +34,7 @@ export class ShortUrlRepository {
             increment: 1,
           },
         },
-        where: { alias } as PrismaPkg.Prisma.ShortUrlWhereUniqueInput,
+        where: { alias } as Prisma.ShortUrlWhereUniqueInput,
       });
 
       return result;
@@ -42,24 +42,24 @@ export class ShortUrlRepository {
   }
 
   findShortUrl(
-    where: PrismaPkg.Prisma.ShortUrlWhereUniqueInput,
-  ): Promise<PrismaPkg.Prisma.ShortUrl | null> {
-    return this.prismaService.client.shortUrl.findUnique({
+    where: Prisma.ShortUrlWhereUniqueInput,
+  ): Promise<ShortUrl | null> {
+    return this.prismaService.shortUrl.findUnique({
       where,
     });
   }
 
-  createShortUrl(data: PrismaPkg.Prisma.ShortUrlCreateInput): Promise<PrismaPkg.Prisma.ShortUrl> {
-    return this.prismaService.client.shortUrl.create({
+  createShortUrl(data: Prisma.ShortUrlCreateInput): Promise<ShortUrl> {
+    return this.prismaService.shortUrl.create({
       data,
     });
   }
 
-  deleteShortUrl(id: number): Promise<PrismaPkg.Prisma.ShortUrl> {
-    return this.prismaService.client.shortUrl.delete({
+  deleteShortUrl(id: number): Promise<ShortUrl> {
+    return this.prismaService.shortUrl.delete({
       where: {
         id,
-      } as PrismaPkg.Prisma.ShortUrlWhereUniqueInput,
+      } as Prisma.ShortUrlWhereUniqueInput,
     });
   }
 }
