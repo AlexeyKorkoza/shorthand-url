@@ -1,29 +1,47 @@
 import { NestFactory } from "@nestjs/core";
 import { ConfigService } from "@nestjs/config";
-import { ValidationPipe } from "@nestjs/common";
+import { Logger } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 
-import { AppModule } from "@/modules/app/app.module";
+import { type AppConfig } from "@/core/interfaces";
+import { AppModule } from "@/app.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
+  const logger = new Logger("Bootstrap");
 
-  const port = configService.get("port") as string;
-  const globalPrefix = configService.get("apiPrefix") as string;
-  app.setGlobalPrefix(globalPrefix, {
-    exclude: [":shortUrl"],
+  const configService = app.get(ConfigService<AppConfig>);
+  const port = configService.get<number>("port", { infer: true });
+  const globalPrefix = configService.get<string>("apiPrefix", { infer: true });
+
+  // @ts-ignore
+  app.setGlobalPrefix(globalPrefix);
+
+  app.enableCors({
+    origin: ["http://localhost:5173"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie", "Set-Cookie"],
   });
-  app.enableCors({ origin: ["http://localhost:5173"] });
-  app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
-    .setTitle("Short URL API")
+    .setTitle("API Documentation")
+    .setDescription("The API endpoints documentation")
     .setVersion("1.0")
+    .addBearerAuth()
     .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api", app, documentFactory);
+  const document = SwaggerModule.createDocument(app, config);
+  const swaggerPath = `${globalPrefix}/docs`;
+  SwaggerModule.setup(swaggerPath, app, document);
 
   await app.listen(port);
+
+  logger.log(
+    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`,
+  );
+  logger.log(
+    `📚 Swagger documentation: http://localhost:${port}/${swaggerPath}`,
+  );
 }
-bootstrap();
+
+void bootstrap();

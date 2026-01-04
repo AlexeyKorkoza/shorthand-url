@@ -1,18 +1,5 @@
-import { IsDate, IsString, IsUrl, IsOptional } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { z } from "zod";
 
-export class CreateShortUrlDto {
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  alias?: string;
+import { createShortUrlSchema } from "@/modules/short-url/schemas/create-short-url.schema";
 
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsDate()
-  expiredAt?: Date;
-
-  @ApiProperty()
-  @IsUrl()
-  originalUrl: string;
-}
+export type CreateShortUrlDto = z.infer<typeof createShortUrlSchema>;

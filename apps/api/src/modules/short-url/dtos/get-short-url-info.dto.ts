@@ -1,15 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { z } from "zod";
 
-export class GetShortUrlInfoDto {
-  @ApiProperty({ type: String })
-  alias!: Alias;
+import { getShortUrlInfoSchema } from "@/modules/short-url/schemas/get-short-url-info.schema";
 
-  @ApiProperty({ type: Date })
-  createdAt!: Date;
-
-  @ApiProperty({ type: Number })
-  clickCount!: number;
-
-  @ApiProperty({ type: String })
-  originalUrl!: UniqueShortUrl;
-}
+export type GetShortUrlInfoDto = z.infer<typeof getShortUrlInfoSchema>;

@@ -1,10 +1,12 @@
-import { Controller, Get, Ip, Param, Redirect } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Ip, Param, Redirect } from "@nestjs/common";
+import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 
-import { ShortUrlService } from '@/modules/short-url/services/short-url.service';
-import { AnalyticsService } from '@/modules/short-url/services/analytics.service';
+import { ShortUrlService } from "@/modules/short-url/services/short-url.service";
+import { AnalyticsService } from "@/modules/short-url/services/analytics.service";
+import { aliasParamSchema } from "@/core/schemas/params.schema";
+import { ZodValidationPipe } from "@/core/pipes/zod-validation.pipe";
 
-@ApiTags('Redirect')
+@ApiTags("Redirect")
 @Controller()
 export class ShortUrlRedirectController {
   constructor(
@@ -12,11 +14,11 @@ export class ShortUrlRedirectController {
     private readonly analyticsService: AnalyticsService,
   ) {}
 
-  @Get(':alias')
+  @Get(":alias")
   @Redirect()
-  @ApiOkResponse({ description: 'Redirects to the original URL' })
+  @ApiOkResponse({ description: "Redirects to the original URL" })
   async redirectToOriginalUrl(
-    @Param('alias') alias: Alias,
+    @Param("alias", new ZodValidationPipe(aliasParamSchema)) alias: Alias,
     @Ip() ipAddress: string,
   ): Promise<{ url: string }> {
     const result =

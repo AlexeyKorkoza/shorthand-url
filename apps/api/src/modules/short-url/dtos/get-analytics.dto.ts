@@ -1,17 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { z } from "zod";
 
-class IpAddressItemDto {
-  @ApiProperty({ type: Number })
-  id!: number;
+import { getAnalyticsSchema } from "@/modules/short-url/schemas/get-analytics.schema";
 
-  @ApiProperty({ type: String })
-  ipAddress!: string;
-
-  @ApiProperty({ type: Number })
-  shortUrlId!: number;
-}
-
-export class GetAnalyticsDto {
-  @ApiProperty({ type: [IpAddressItemDto] })
-  ipAddresses!: Array<IpAddressItemDto>;
-}
+export type GetAnalyticsDto = z.infer<typeof getAnalyticsSchema>;

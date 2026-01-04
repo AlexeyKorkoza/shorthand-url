@@ -1,6 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { z } from "zod";
 
-export class CreateShortUrlResponseDto {
-  @ApiProperty({ description: 'Generated short URL', type: String })
-  shortUrl!: UniqueShortUrl;
-}
+import { createShortUrlResponseSchema } from "@/modules/short-url/schemas/create-short-url-response.schema";
+
+export type CreateShortUrlResponseDto = z.infer<
+  typeof createShortUrlResponseSchema
+>;
