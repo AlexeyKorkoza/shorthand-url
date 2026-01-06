@@ -3,3 +3,7 @@ export type { GetAnalyticsDto } from "./get-analytics.dto.ts";
 export type { GetShortUrlDto } from "./get-short-url.dto.ts";
 export type { IpAddressItemModel } from "./ip-address-item.model.ts";
 export type { UrlAnalyticsTableColumn } from "./url-analytics-table-column.model.ts";
+export type { UserModel } from "./user.model.ts";
+export type { SignInDto } from "./sign-in.dto.ts";
+export type { SignUpDto } from "./sign-up.dto.ts";
+export type { UpdateProfileDto } from "./update-profile.dto.ts";
