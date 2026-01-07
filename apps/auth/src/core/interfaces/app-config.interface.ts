@@ -10,7 +10,20 @@ export interface AppConfig {
   rabbitmq: {
     url: string;
   };
+  accessToken: {
+    secret: string;
+    expiresIn: number;
+  };
+  refreshToken: {
+    secret: string;
+    expiresIn: number;
+    saltRounds: number;
+  };
   password: {
-    salt: number;
+    saltRounds: number;
+  };
+  userSession: {
+    prefix: string;
+    ttl: number;
   };
 }

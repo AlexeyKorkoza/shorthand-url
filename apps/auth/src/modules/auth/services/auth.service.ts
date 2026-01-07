@@ -3,12 +3,14 @@ import {
   ConflictException,
   UnauthorizedException,
   NotFoundException,
+  HttpException,
+  HttpStatus,
+  Logger,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import { isBefore } from 'date-fns';
 
 import { AuthRepository } from '@/modules/auth/repositories/auth.repository';
-import { type AppConfig } from '@/core/interfaces';
 import {
   type GetUserDto,
   type SignInDto,
@@ -16,130 +18,272 @@ import {
   type UpdateProfileDto,
 } from '@/modules/auth/dtos';
 import { type User } from '@db/prisma-client';
+import { PasswordService } from '@/modules/auth/services/password.service';
+import { RefreshTokenService } from '@/modules/auth/services/refresh-token.service';
+import { TokenService } from '@/core/services/token.service';
+import { UserSessionService } from '@/core/services/user-session.service';
+import { type AccessTokenPayload } from '@/modules/auth/interfaces/access-token-payload.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly authRepository: AuthRepository,
-    private readonly configService: ConfigService<AppConfig>,
+    private readonly passwordService: PasswordService,
+    private readonly refreshTokenService: RefreshTokenService,
+    private readonly tokenService: TokenService,
+    private readonly userSessionService: UserSessionService,
   ) {}
 
-  private encryptPassword(password: string): string {
-    const passwordSalt = this.configService.get('password.salt', {
-      infer: true,
-    });
-
-    return bcrypt.hashSync(password, passwordSalt);
-  }
-
-  private comparePasswords(
-    password: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
-    return bcrypt.compare(password, hashedPassword);
-  }
-
   async signUp(registerDto: SignUpDto) {
-    const existingUser = await this.authRepository.findUserByEmail({
-      email: registerDto.email,
-    });
+    try {
+      const existingUser = await this.authRepository.findUserByEmail({
+        email: registerDto.email,
+      });
 
-    if (existingUser) {
-      throw new ConflictException('User with this email already exists');
+      if (existingUser) {
+        throw new ConflictException('User with this email already exists');
+      }
+
+      const hashedPassword = await this.passwordService.hashPassword(
+        registerDto.password,
+      );
+
+      const user = await this.authRepository.createUser({
+        email: registerDto.email,
+        password: hashedPassword,
+      });
+
+      return user;
+    } catch (error) {
+      Logger.error('Something went wrong when signing up', error);
+
+      throw new HttpException(
+        'Something went wrong when signing up',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
-    const hashedPassword = this.encryptPassword(registerDto.password);
-
-    const user = await this.authRepository.createUser({
-      email: registerDto.email,
-      password: hashedPassword,
-    });
-
-    return user;
   }
 
-  async signIn(loginDto: SignInDto): Promise<GetUserDto> {
-    const user = await this.authRepository.findUserByEmail({
-      email: loginDto.email,
-    });
+  // AuthLoginResponse
+  async signIn(loginDto: SignInDto): Promise<any> {
+    try {
+      const user = await this.authRepository.findUserByEmail({
+        email: loginDto.email,
+      });
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      if (!user) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      const isPasswordValid = await this.passwordService.comparePasswords(
+        loginDto.password,
+        user.password,
+      );
+
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      const { id: userId } = user;
+      const refreshToken = await this.tokenService.generateRefreshToken({
+        id: userId,
+      });
+      if (!refreshToken) {
+        throw new HttpException(
+          'Something went wrong when creating refresh token',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      await this.refreshTokenService.createRefreshToken(userId);
+
+      const accessToken =
+        await this.tokenService.generateAccessToken<AccessTokenPayload>({
+          userId,
+          email: user.email,
+        });
+      if (!accessToken) {
+        throw new HttpException(
+          'Something went wrong when creating access token',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      return {
+        accessToken,
+        refreshToken,
+        user,
+      };
+    } catch (error) {
+      Logger.error('Something went wrong when signing in', error);
+
+      throw new HttpException(
+        'Something went wrong when signing in',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
-    const isPasswordValid = await this.comparePasswords(
-      loginDto.password,
-      user.password,
-    );
-
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    return {
-      id: user.id,
-      email: user.email,
-      createdAt: user.createdAt,
-    };
   }
 
   async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
-    const user = await this.authRepository.findUserById({ id: userId });
+    try {
+      const user = await this.authRepository.findUserById({ id: userId });
 
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    const updateData: {
-      email?: string;
-      password?: string;
-    } = {};
-
-    if (updateProfileDto.email) {
-      const existingUser = await this.authRepository.findUserByEmail({
-        email: updateProfileDto.email,
-      });
-
-      if (existingUser && existingUser.id !== userId) {
-        throw new ConflictException('Email already in use');
+      if (!user) {
+        throw new NotFoundException('User not found');
       }
 
-      updateData.email = updateProfileDto.email;
+      const updateData: {
+        email?: string;
+        password?: string;
+      } = {};
+
+      if (updateProfileDto.email) {
+        const existingUser = await this.authRepository.findUserByEmail({
+          email: updateProfileDto.email,
+        });
+
+        if (existingUser && existingUser.id !== userId) {
+          throw new ConflictException('Email already in use');
+        }
+
+        updateData.email = updateProfileDto.email;
+      }
+
+      if (updateProfileDto.password) {
+        updateData.password = await bcrypt.hash(updateProfileDto.password, 10);
+      }
+
+      const updatedUser = await this.authRepository.updateUser({
+        id: userId,
+        data: updateData,
+        select: {
+          id: true,
+          email: true,
+          createdAt: true,
+        },
+      });
+
+      return updatedUser;
+    } catch (error) {
+      Logger.error('Something went wrong when updating profile', error);
+
+      throw new HttpException(
+        'Something went wrong when updating profile',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
-    if (updateProfileDto.password) {
-      updateData.password = await bcrypt.hash(updateProfileDto.password, 10);
-    }
-
-    const updatedUser = await this.authRepository.updateUser({
-      id: userId,
-      data: updateData,
-      select: {
-        id: true,
-        email: true,
-        createdAt: true,
-      },
-    });
-
-    return updatedUser;
   }
 
   async getProfile(
     userId: string,
   ): Promise<Omit<User, 'password' | 'updatedAt'>> {
-    const user = await this.authRepository.findUserById({
-      id: userId,
-      select: {
-        id: true,
-        email: true,
-        createdAt: true,
-      },
-    });
+    try {
+      const user = await this.authRepository.findUserById({
+        id: userId,
+        select: {
+          id: true,
+          email: true,
+          createdAt: true,
+        },
+      });
 
-    if (!user) {
-      throw new NotFoundException('User not found');
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      return user;
+    } catch (error) {
+      Logger.error('Something went wrong when getting profile', error);
+
+      throw new HttpException(
+        'Something went wrong when getting profile',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
+  }
 
-    return user;
+  async refreshAccessToken({
+    refreshToken,
+    sessionId,
+  }: {
+    refreshToken: string;
+    sessionId: string;
+  }): Promise<{ accessToken: string }> {
+    try {
+      const userSession = await this.userSessionService.getSession(sessionId);
+      const { userId, email } = userSession;
+
+      const foundRefreshToken = await this.refreshTokenService.findRefreshToken(
+        { refreshToken, userId },
+      );
+      if (!foundRefreshToken) {
+        throw new NotFoundException('Refresh token not found');
+      }
+
+      const expiresAtDate = new Date(foundRefreshToken.expiresAt);
+      const currentDate = new Date();
+
+      const isRefreshTokenExpired = isBefore(expiresAtDate, currentDate);
+      if (isRefreshTokenExpired) {
+        throw new HttpException(
+          'Refresh token expired',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // AccessTokenPayload
+      const accessToken = await this.tokenService.generateAccessToken<any>({
+        userId,
+        email,
+      });
+
+      return { accessToken };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      Logger.error('Something went wrong when refreshing access token', error);
+
+      throw new HttpException(
+        'Something went wrong when refreshing access token',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async logoutUser({
+    refreshToken,
+    sessionId,
+  }: {
+    refreshToken: string;
+    sessionId: string;
+  }): Promise<void> {
+    try {
+      const userSession = await this.userSessionService.getSession(sessionId);
+      const { userId } = userSession;
+
+      const foundRefreshToken = await this.refreshTokenService.findRefreshToken(
+        { refreshToken, userId },
+      );
+      if (!foundRefreshToken) {
+        throw new NotFoundException('Refresh token not found');
+      }
+
+      const { token_hash: tokenHash } = foundRefreshToken;
+
+      await this.refreshTokenService.revokeRefreshToken(tokenHash);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      Logger.error('Something went wrong when logging out user', error);
+
+      throw new HttpException(
+        'Something went wrong when logging out user',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

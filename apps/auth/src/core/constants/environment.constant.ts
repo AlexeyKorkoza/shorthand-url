@@ -9,4 +9,14 @@ export const DEFAULT_REDIS_PORT = '6379';
 
 export const DEFAULT_RABBITMQ_URL = 'amqp://localhost:5672';
 
-export const DEFAULT_PASSWORD_SALT = '10';
+export const DEFAULT_PASSWORD_SALT_ROUNDS = '10';
+
+export const DEFAULT_ACCESS_TOKEN_SECRET = 'access_token_secret';
+export const DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SECONDS = '900';
+
+export const DEFAULT_REFRESH_TOKEN_SECRET = 'refresh_token_secret';
+export const DEFAULT_REFRESH_TOKEN_EXPIRES_IN_SECONDS = '144000';
+export const DEFAULT_REFRESH_TOKEN_SALT_ROUNDS = '10';
+
+export const DEFAULT_USER_SESSION_PREFIX = 'session';
+export const DEFAULT_USER_SESSION_TTL = '86400';
