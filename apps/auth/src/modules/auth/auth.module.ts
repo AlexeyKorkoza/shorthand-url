@@ -1,17 +1,19 @@
-import { Module } from '@nestjs/common';
+import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
 
-import { AuthController } from './controllers/auth.controller';
-import { AuthService } from './services/auth.service';
-import { AuthRepository } from './repositories/auth.repository';
-import { PasswordService } from '@/modules/auth/services/password.service';
-import { RefreshTokenService } from '@/modules/auth/services/refresh-token.service';
-import { RefreshTokenRepository } from '@/modules/auth/repositories/refresh-token.repository';
-import { CoreModule } from '@/core/core.module';
+import { CoreModule } from "@/core/core.module";
+import { RefreshTokenRepository } from "@/modules/auth/repositories/refresh-token.repository";
+import { PasswordService } from "@/modules/auth/services/password.service";
+import { RefreshTokenService } from "@/modules/auth/services/refresh-token.service";
+import { AuthHandleService } from "./controllers/auth-handle.service";
+import { AuthRepository } from "./repositories/auth.repository";
+import { AuthService } from "./services/auth.service";
 
 @Module({
-  imports: [CoreModule],
-  controllers: [AuthController],
+  imports: [CoreModule, ConfigModule],
+  controllers: [],
   providers: [
+    AuthHandleService,
     AuthService,
     AuthRepository,
     PasswordService,

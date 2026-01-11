@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
-
-import { type ShortUrlAnalytic } from '@db/prisma-client';
-import { PrismaService } from '@/services/prisma.service';
+import { type ShortUrlAnalytic } from "@db/prisma-client";
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "@/core/services/prisma.service";
 
 @Injectable()
 export class AnalyticsRepository {

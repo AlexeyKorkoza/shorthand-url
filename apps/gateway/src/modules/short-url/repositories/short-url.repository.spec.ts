@@ -1,6 +1,6 @@
-import { ShortUrl } from '@prisma/client';
-import type { PrismaService } from '@/services/prisma.service';
-import { ShortUrlRepository } from './short-url.repository';
+import { ShortUrl } from "@prisma/client";
+import type { PrismaService } from "@/core/services/prisma.service";
+import { ShortUrlRepository } from "./short-url.repository";
 
 interface PrismaShortUrlDelegate {
   findMany: jest.Mock<Promise<ShortUrl[]>, []>;
@@ -18,7 +18,7 @@ interface PrismaClientMock {
   $transaction: jest.Mock<Promise<unknown>, [TransactionCallback]>;
 }
 
-describe('ShortUrlRepository', () => {
+describe("ShortUrlRepository", () => {
   const prisma: PrismaClientMock = {
     shortUrl: {
       findMany: jest.fn<Promise<ShortUrl[]>, []>(),
@@ -37,13 +37,13 @@ describe('ShortUrlRepository', () => {
     repository = new ShortUrlRepository(prisma as unknown as PrismaService);
   });
 
-  it('findAllShortUrls returns list', async () => {
+  it("findAllShortUrls returns list", async () => {
     const data: ShortUrl[] = [
       {
         id: 1,
-        alias: 'a',
-        originalUrl: 'https://example.com',
-        shortUrl: 'https://sho.rt/a',
+        alias: "a",
+        originalUrl: "https://example.com",
+        shortUrl: "https://sho.rt/a",
         clickCount: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -58,13 +58,13 @@ describe('ShortUrlRepository', () => {
     expect(result).toBe(data);
   });
 
-  describe('findOriginalUrlAndUpdateClickCount', () => {
-    it('returns original when found and increments clickCount', async () => {
+  describe("findOriginalUrlAndUpdateClickCount", () => {
+    it("returns original when found and increments clickCount", async () => {
       const found: ShortUrl = {
         id: 1,
-        alias: 'a',
-        originalUrl: 'https://example.com',
-        shortUrl: 'https://sho.rt/a',
+        alias: "a",
+        originalUrl: "https://example.com",
+        shortUrl: "https://sho.rt/a",
         clickCount: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -72,9 +72,9 @@ describe('ShortUrlRepository', () => {
       };
       const tx: Tx = {
         shortUrl: {
-          findUnique: jest.fn<Promise<ShortUrl | null>, [unknown]>().mockResolvedValueOnce(
-            found,
-          ),
+          findUnique: jest
+            .fn<Promise<ShortUrl | null>, [unknown]>()
+            .mockResolvedValueOnce(found),
           update: jest
             .fn<Promise<unknown>, [unknown]>()
             .mockResolvedValueOnce(undefined as unknown as ShortUrl),
@@ -83,47 +83,51 @@ describe('ShortUrlRepository', () => {
           delete: jest.fn<Promise<ShortUrl>, [unknown]>(),
         },
       };
-      prisma.$transaction.mockImplementation((cb: TransactionCallback) => Promise.resolve(cb(tx)));
+      prisma.$transaction.mockImplementation((cb: TransactionCallback) =>
+        Promise.resolve(cb(tx)),
+      );
 
-      const result = await repository.findOriginalUrlAndUpdateClickCount('a');
+      const result = await repository.findOriginalUrlAndUpdateClickCount("a");
 
       expect(tx.shortUrl.findUnique).toHaveBeenCalledWith({
-        where: { alias: 'a' },
+        where: { alias: "a" },
       });
       expect(tx.shortUrl.update).toHaveBeenCalledWith({
         data: { clickCount: { increment: 1 } },
-        where: { alias: 'a' },
+        where: { alias: "a" },
       });
       expect(result).toBe(found);
     });
 
-    it('throws when not found', async () => {
+    it("throws when not found", async () => {
       const tx: Tx = {
         shortUrl: {
-          findUnique: jest.fn<Promise<ShortUrl | null>, [unknown]>().mockResolvedValueOnce(
-            null,
-          ),
+          findUnique: jest
+            .fn<Promise<ShortUrl | null>, [unknown]>()
+            .mockResolvedValueOnce(null),
           update: jest.fn<Promise<unknown>, [unknown]>(),
           findMany: jest.fn<Promise<ShortUrl[]>, []>(),
           create: jest.fn<Promise<ShortUrl>, [unknown]>(),
           delete: jest.fn<Promise<ShortUrl>, [unknown]>(),
         },
       };
-      prisma.$transaction.mockImplementation((cb: TransactionCallback) => Promise.resolve(cb(tx)));
+      prisma.$transaction.mockImplementation((cb: TransactionCallback) =>
+        Promise.resolve(cb(tx)),
+      );
 
       await expect(
-        repository.findOriginalUrlAndUpdateClickCount('missing'),
-      ).rejects.toThrow('Short URL not found');
+        repository.findOriginalUrlAndUpdateClickCount("missing"),
+      ).rejects.toThrow("Short URL not found");
       expect(tx.shortUrl.update).not.toHaveBeenCalled();
     });
   });
 
-  it('findShortUrl delegates to prisma.findUnique', async () => {
+  it("findShortUrl delegates to prisma.findUnique", async () => {
     const item: ShortUrl = {
       id: 1,
-      alias: 'a',
-      originalUrl: 'https://example.com',
-      shortUrl: 'https://sho.rt/a',
+      alias: "a",
+      originalUrl: "https://example.com",
+      shortUrl: "https://sho.rt/a",
       clickCount: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -132,21 +136,21 @@ describe('ShortUrlRepository', () => {
     prisma.shortUrl.findUnique.mockResolvedValueOnce(item);
 
     const result = await repository.findShortUrl({
-      alias: 'a',
+      alias: "a",
     } as unknown as any);
 
     expect(prisma.shortUrl.findUnique).toHaveBeenCalledWith({
-      where: { alias: 'a' },
+      where: { alias: "a" },
     });
     expect(result).toBe(item);
   });
 
-  it('createShortUrl delegates to prisma.create', async () => {
+  it("createShortUrl delegates to prisma.create", async () => {
     const item: ShortUrl = {
       id: 1,
-      alias: 'a',
-      originalUrl: 'https://example.com',
-      shortUrl: 'https://sho.rt/a',
+      alias: "a",
+      originalUrl: "https://example.com",
+      shortUrl: "https://sho.rt/a",
       clickCount: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -155,27 +159,27 @@ describe('ShortUrlRepository', () => {
     prisma.shortUrl.create.mockResolvedValueOnce(item);
 
     const result = await repository.createShortUrl({
-      alias: 'a',
-      originalUrl: 'https://example.com',
-      shortUrl: 'https://sho.rt/a',
+      alias: "a",
+      originalUrl: "https://example.com",
+      shortUrl: "https://sho.rt/a",
     } as unknown as any);
 
     expect(prisma.shortUrl.create).toHaveBeenCalledWith({
       data: {
-        alias: 'a',
-        originalUrl: 'https://example.com',
-        shortUrl: 'https://sho.rt/a',
+        alias: "a",
+        originalUrl: "https://example.com",
+        shortUrl: "https://sho.rt/a",
       },
     });
     expect(result).toBe(item);
   });
 
-  it('deleteShortUrl delegates to prisma.delete', async () => {
+  it("deleteShortUrl delegates to prisma.delete", async () => {
     const item: ShortUrl = {
       id: 1,
-      alias: 'a',
-      originalUrl: 'https://example.com',
-      shortUrl: 'https://sho.rt/a',
+      alias: "a",
+      originalUrl: "https://example.com",
+      shortUrl: "https://sho.rt/a",
       clickCount: 0,
       createdAt: new Date(),
       updatedAt: new Date(),

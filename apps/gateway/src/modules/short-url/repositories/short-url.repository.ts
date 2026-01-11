@@ -1,8 +1,7 @@
-import { Injectable } from '@nestjs/common';
-
-import { Prisma, type ShortUrl } from '@db/prisma-client';
-import { PrismaService } from '@/services/prisma.service';
-import { GetShortUrlDto } from '@/modules/short-url/dtos';
+import { Prisma, type ShortUrl } from "@db/prisma-client";
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "@/core/services/prisma.service";
+import { GetShortUrlDto } from "@/modules/short-url/dtos";
 
 @Injectable()
 export class ShortUrlRepository {
@@ -25,7 +24,7 @@ export class ShortUrlRepository {
         } as Prisma.ShortUrlWhereUniqueInput,
       });
       if (!result) {
-        throw new Error('Short URL not found');
+        throw new Error("Short URL not found");
       }
 
       await tx.shortUrl.update({

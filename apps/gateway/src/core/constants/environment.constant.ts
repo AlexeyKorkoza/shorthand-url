@@ -7,4 +7,4 @@ export const DEFAULT_DATABASE_URL =
 export const DEFAULT_REDIS_HOST = "localhost";
 export const DEFAULT_REDIS_PORT = "6379";
 
-export const DEFAULT_RABBITMQ_URL = "amqp://localhost:5672";
+export const DEFAULT_RABBITMQ_URL = "amqp://guest:guest@localhost:5672";

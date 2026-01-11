@@ -1,17 +1,13 @@
-import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule } from '@nestjs/config';
+import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from '@/modules/auth/auth.module';
-import { CoreModule } from '@/core/core.module';
-
-import configuration from '@/configuration';
+import configuration from "@/configuration";
+import { CoreModule } from "@/core/core.module";
 import {
   validateConfig,
   validationSchema,
-} from '@/core/schemas/configuration.schema';
+} from "@/core/schemas/configuration.schema";
+import { AuthModule } from "@/modules/auth/auth.module";
 
 @Module({
   imports: [
@@ -24,11 +20,8 @@ import {
         abortEarly: false,
       },
     }),
-    JwtModule.register({}),
-    AuthModule,
     CoreModule,
+    AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

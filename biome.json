@@ -1,0 +1,22 @@
+{
+      "linter": {
+            "enabled": true,
+            "rules": {
+                  "recommended": true,
+                  "style": {
+                        "useConst": "off",
+                        "useImportType": "off"
+                  }
+            }
+      },
+      "formatter": {
+            "lineWidth": 120,
+            "indentStyle": "space",
+            "indentWidth": 6
+      },
+      "javascript": {
+            "parser": {
+                  "unsafeParameterDecoratorsEnabled": true
+            }
+      }
+}

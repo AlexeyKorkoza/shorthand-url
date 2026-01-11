@@ -1,5 +1,5 @@
 export interface UserSession {
-  userId: number;
+  userId: string;
   email: string;
   createdAt: Date;
   lastActivity: Date;

@@ -1,13 +1,13 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { type Redis } from 'ioredis';
-import crypto from 'node:crypto';
+import crypto from "node:crypto";
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import type { ConfigService } from "@nestjs/config";
+import type { UserEntity } from "@repo/api";
+import type { Redis } from "ioredis";
 
-import { type UserSession } from '@/modules/auth/interfaces';
-// import { type UserEntity } from '@repo/api';
-import { REDIS_KEYS } from '@/core/constants/redis-keys.constant';
-import { type AppConfig } from '@/core/interfaces';
-import { REDIS_CLIENT } from '@/core/constants/symbols.constant';
+import { REDIS_KEYS } from "@/core/constants/redis-keys.constant";
+import { REDIS_CLIENT } from "@/core/constants/symbols.constant";
+import type { AppConfig } from "@/core/interfaces";
+import type { UserSession } from "@/modules/auth/interfaces";
 
 @Injectable()
 export class UserSessionService {
@@ -17,14 +17,15 @@ export class UserSessionService {
 
   constructor(
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
-    private readonly configService: ConfigService<AppConfig>,
+    // private readonly configService: ConfigService<AppConfig>,
   ) {
-    this.sessionTtl = this.configService.get<number>('userSession.ttl', {
-      infer: true,
-    });
-    this.sessionPrefix = this.configService.get<string>('userSession.prefix', {
-      infer: true,
-    });
+    // this.sessionTtl = configService.get<number>("userSession.ttl", {
+    //   infer: true,
+    // });
+    // // @ts-expect-error
+    // this.sessionPrefix = configService.get<string>("userSession.prefix", {
+    //   infer: true,
+    // });
   }
 
   async createSession({
@@ -32,7 +33,7 @@ export class UserSessionService {
     ipAddress,
     userAgent,
   }: {
-    user: any /*UserEntity;*/;
+    user: UserEntity;
     ipAddress: string;
     userAgent: string;
   }): Promise<string> {
@@ -44,8 +45,8 @@ export class UserSessionService {
         email,
         createdAt,
         lastActivity: new Date(),
-        ipAddress: ipAddress ?? '',
-        userAgent: userAgent ?? '',
+        ipAddress: ipAddress ?? "",
+        userAgent: userAgent ?? "",
       };
 
       const pipeline = this.redis.pipeline();
@@ -61,7 +62,7 @@ export class UserSessionService {
 
       return sessionId;
     } catch (error) {
-      this.logger.error('Failed to create session', error);
+      this.logger.error("Failed to create session", error);
 
       throw error;
     }
@@ -136,8 +137,8 @@ export class UserSessionService {
 
   private generateDeviceHash(userAgent: string, ipAddress: string): string {
     return crypto
-      .createHash('sha256')
+      .createHash("sha256")
       .update(`${this.sessionPrefix}:${userAgent}:${ipAddress}`)
-      .digest('hex');
+      .digest("hex");
   }
 }

@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
+import type { RefreshTokenEntity } from "@repo/api";
 
-import { PrismaService } from '@/core/services/prisma.service';
-import type { RefreshTokenEntity } from '@repo/api';
+import { PrismaService } from "@/core/services/prisma.service";
 
 @Injectable()
 export class RefreshTokenRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  findAllActiveRefreshTokens(userId: number): Promise<RefreshTokenEntity[]> {
+  findAllActiveRefreshTokens(userId: UserId): Promise<RefreshTokenEntity[]> {
     return this.prismaService.refreshToken.findMany({
       where: {
         userId,
@@ -17,7 +17,7 @@ export class RefreshTokenRepository {
   }
 
   createRefreshToken(
-    data: Pick<RefreshTokenEntity, 'userId' | 'token_hash' | 'expiresAt'>,
+    data: Pick<RefreshTokenEntity, "userId" | "token_hash" | "expiresAt">,
   ): Promise<RefreshTokenEntity> {
     return this.prismaService.refreshToken.create({
       data,
@@ -35,7 +35,7 @@ export class RefreshTokenRepository {
     });
   }
 
-  revokeAllRefreshTokens(userId: number): Promise<any> {
+  revokeAllRefreshTokens(userId: UserId): Promise<any> {
     return this.prismaService.refreshToken.updateMany({
       where: {
         userId,

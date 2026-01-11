@@ -1,11 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import * as bcrypt from 'bcrypt';
-
-import { TokenService } from '@/core/services/token.service';
-import { RefreshTokenRepository } from '@/modules/auth/repositories/refresh-token.repository';
-// import { type RefreshTokenEntity } from '@repo/api';
-import { type AppConfig } from '@/core/interfaces';
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import type { RefreshTokenEntity } from "@repo/api";
+import * as bcrypt from "bcrypt";
+import type { AppConfig } from "@/core/interfaces";
+import { TokenService } from "@/core/services/token.service";
+import { RefreshTokenRepository } from "@/modules/auth/repositories/refresh-token.repository";
 
 @Injectable()
 export class RefreshTokenService {
@@ -17,7 +16,7 @@ export class RefreshTokenService {
 
   private hashRefreshToken(refreshToken: string): Promise<string> {
     const refreshTokenSaltRounds = this.configService.get<number>(
-      'refreshToken.saltRounds',
+      "refreshToken.saltRounds",
       { infer: true },
     );
 
@@ -29,12 +28,11 @@ export class RefreshTokenService {
     userId,
   }: {
     refreshToken: string;
-    userId: number;
-    /*RefreshTokenEntity*/
-  }): Promise<any> {
+    userId: UserId;
+  }): Promise<RefreshTokenEntity | null> {
     const activeRefreshTokens =
       await this.refreshTokenRepository.findAllActiveRefreshTokens(userId);
-    let validStoredToken: /*RefreshTokenEntity*/ any | null = null;
+    let validStoredToken: RefreshTokenEntity | null = null;
 
     for (const activeRefreshToken of activeRefreshTokens) {
       const isMatch = await bcrypt.compare(
@@ -51,13 +49,12 @@ export class RefreshTokenService {
     return validStoredToken;
   }
 
-  /*RefreshTokenEntity*/
-  async createRefreshToken(userId: number): Promise<any> {
+  async createRefreshToken(userId: UserId): Promise<RefreshTokenEntity> {
     const refresh_token = await this.tokenService.generateRefreshToken({
       id: userId,
     });
     const refreshTokenExpiresIn = this.configService.get<number>(
-      'refreshToken.expiresIn',
+      "refreshToken.expiresIn",
       { infer: true },
     );
 
@@ -65,7 +62,7 @@ export class RefreshTokenService {
     const expiresAt = new Date(Date.now() + refreshTokenExpiresIn * 1000);
     const body: Pick<
       RefreshTokenEntity,
-      'userId' | 'token_hash' | 'expiresAt'
+      "userId" | "token_hash" | "expiresAt"
     > = {
       userId,
       token_hash,
@@ -75,8 +72,7 @@ export class RefreshTokenService {
     return this.refreshTokenRepository.createRefreshToken(body);
   }
 
-  /*RefreshTokenEntity*/
-  async revokeRefreshToken(tokenHash: string): Promise<any> {
+  async revokeRefreshToken(tokenHash: string): Promise<RefreshTokenEntity> {
     return this.refreshTokenRepository.revokeRefreshToken(tokenHash);
   }
 }

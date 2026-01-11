@@ -23,12 +23,14 @@
     "db:generate": "npx prisma generate"
   },
   "dependencies": {
+    "@golevelup/nestjs-rabbitmq": "^7.1.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.0",
     "@prisma/client": "^6.14.0",
+    "@repo/api": "workspace:*",
     "class-transformer": "^0.5.1",
     "ioredis": "^5.8.2",
     "nanoid": "^5.1.5",
@@ -38,7 +40,6 @@
     "zod": "^4.3.4"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.1.2",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
